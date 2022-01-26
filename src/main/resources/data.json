@@ -1,0 +1,12 @@
+{
+  "templateId": 1,
+  "requestedBy":  "userId",
+  "data": [
+    {
+      "transactionId": "12345"
+    },
+    {
+      "transactionId": "12346"
+    }
+  ]
+}
