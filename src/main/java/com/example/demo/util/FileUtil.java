@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class FileUtil {
 
-    public String readResourceFileAsString(String filename) {
+    public static String readResourceFileAsString(String filename) {
         try {
             InputStream inputStream = FileUtil.class.getClassLoader().getResourceAsStream(filename);
             if (inputStream == null) {
