@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Body;
 import com.example.demo.model.Column;
 import com.example.demo.model.ReportData;
 import com.example.demo.util.FileUtil;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,24 +31,41 @@ public class ReportExcelExporterTest {
         assertNotNull(data);
 
         Workbook workbook = new XSSFWorkbook(data);
-        Sheet firstSheet = verifySheetData(workbook);
+        Sheet firstSheet = workbook.getSheetAt(0);
+        verifySheetData(firstSheet);
 
-        List<Column> headers = reportData.getBody().getColumns();
+        Body body = reportData.getBody();
+        List<Column> columns = body.getColumns();
 
         final int HEADER_ROW = 0;
         Row headerRow = firstSheet.getRow(HEADER_ROW);
         assertNotNull(headerRow);
 
-        verifyColumn(headers.get(0), headerRow.getCell(0));
-        verifyColumn(headers.get(1), headerRow.getCell(1));
+        verifyHeaderColumns(columns, headerRow);
+
+        Row firstDataRow = firstSheet.getRow(1);
+        assertNotNull(firstDataRow);
+
+        Cell firstDataRowCell = firstDataRow.getCell(0);
+
+        List<Map<String, Object>> rows = body.getRows();
+        assertEquals(rows.get(0).get(columns.get(0).getName()), firstDataRowCell.getStringCellValue());
+
+        Cell secondDataRowCell = firstDataRow.getCell(1);
+        assertEquals(rows.get(1).get(columns.get(1).getName()), secondDataRowCell.getStringCellValue());
     }
 
-    private Sheet verifySheetData(Workbook workbook) {
-        Sheet firstSheet = workbook.getSheetAt(0);
+    private void verifyHeaderColumns(List<Column> headers, Row headerRow) {
+        verifyColumn(headers.get(0), headerRow.getCell(0));
+        verifyColumn(headers.get(1), headerRow.getCell(1));
+        verifyColumn(headers.get(2), headerRow.getCell(2));
+        verifyColumn(headers.get(3), headerRow.getCell(3));
+        verifyColumn(headers.get(4), headerRow.getCell(4));
+    }
 
-        assertNotNull(firstSheet);
-        assertEquals("new sheet", firstSheet.getSheetName());
-        return firstSheet;
+    private void verifySheetData(Sheet sheet) {
+        assertNotNull(sheet);
+        assertEquals("new sheet", sheet.getSheetName());
     }
 
     private ReportData createReportData() throws JsonProcessingException {
