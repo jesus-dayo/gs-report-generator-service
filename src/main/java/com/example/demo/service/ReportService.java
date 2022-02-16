@@ -1,12 +1,22 @@
 package com.example.demo.service;
 
 import com.example.demo.model.ReportData;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 
+@Service
+@Slf4j
+@RequiredArgsConstructor
 public class ReportService {
-    public ByteArrayInputStream exportUserData(ReportData reportData) {
-        return new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8));
+
+    private final ReportExcelExporter reportExcelExporter;
+
+    public ByteArrayInputStream exportUserData(ReportData reportData) throws JsonProcessingException {
+        return null;
     }
+
 }

@@ -43,27 +43,32 @@ public class ReportExcelExporterTest {
         assertNotNull(headerRow);
 
         verifyHeaderColumns(columns, headerRow);
-
-        Row firstDataRow = firstSheet.getRow(1);
-        assertNotNull(firstDataRow);
-
         verifyDataForEachRows(columns, rows, firstSheet);
     }
 
     private void verifyDataForEachRows(List<Column> columns, List<Map<String, Object>> rows, Sheet sheet) {
         for (int i = 0; i < rows.size(); i++) {
-            Row dataRow = sheet.getRow(i + 1);
+            Row row = sheet.getRow(i + 1);
+            Map<String, Object> rowRawData = rows.get(i);
             for (int j = 0; j < columns.size(); j++) {
-                verifyRow(columns.get(j), rows.get(j), dataRow.getCell(j));
+                verifyRow(columns.get(j), rowRawData, row.getCell(j));
             }
         }
     }
 
     private void verifyRow(Column column, Map<String, Object> row, Cell cell) {
         if (column.getType().equalsIgnoreCase("double") || column.getType().equalsIgnoreCase("decimal")) {
-            assertEquals(Double.parseDouble(row.get(column.getName()).toString()), Double.parseDouble(cell.getStringCellValue()), "encounter error with column key " + column.getName());
+            assertEquals(
+                    Double.parseDouble(row.get(column.getName()).toString()),
+                    Double.parseDouble(cell.getStringCellValue()),
+                    "encounter error with column key " + column.getName()
+            );
         } else {
-            assertEquals(row.get(column.getName()), cell.getStringCellValue(), "encounter error with column key " + column.getName());
+            assertEquals(
+                    row.get(column.getName()) == null ? "" : row.get(column.getName()),
+                    cell.getStringCellValue(),
+                    "encounter error with column key " + column.getName()
+            );
         }
     }
 

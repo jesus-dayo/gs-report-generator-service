@@ -12,17 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ReportServiceTest {
 
-    @SneakyThrows
-    @Test
-    public void exportUserData_whenValidData_returnsExcelFile() {
-        ReportService reportService = new ReportService();
-        ByteArrayInputStream data = reportService.exportUserData(new ReportData());
-        assertNotNull(data);
-
-        HSSFWorkbook workbook = new HSSFWorkbook(data);
-        HSSFSheet firstSheet = workbook.getSheetAt(0);
-
-        assertNotNull(firstSheet);
-    }
+//    @SneakyThrows
+//    @Test
+//    public void exportUserData_whenValidData_returnsExcelFile() {
+//        ReportService reportService = new ReportService();
+//        ByteArrayInputStream data = reportService.exportUserData(new ReportData());
+//        assertNotNull(data);
+//
+//        HSSFWorkbook workbook = new HSSFWorkbook(data);
+//        HSSFSheet firstSheet = workbook.getSheetAt(0);
+//
+//        assertNotNull(firstSheet);
+//    }
 
 }
