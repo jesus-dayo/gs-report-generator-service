@@ -25,15 +25,25 @@ public class ReportExcelExporter {
             List<Column> columns = body.getColumns();
             List<Map<String, Object>> rows = body.getRows();
 
-            Row row = firstSheet.createRow(1);
-            row.createCell(0).setCellValue(rows.get(0).get(columns.get(0).getName()).toString());
-            row.createCell(1).setCellValue(rows.get(1).get(columns.get(1).getName()).toString());
+            createDataRows(firstSheet, columns, rows);
 
             return exportAsByteArrayInputStream(workbook);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private void createDataRows(Sheet firstSheet, List<Column> columns, List<Map<String, Object>> rows) {
+        for (int i = 0; i < rows.size(); i++) {
+            Row row = firstSheet.createRow(i + 1);
+            for (int j = 0; j < columns.size(); j++) {
+                row.createCell(j).setCellValue(rows.get(j).get(columns.get(j).getName()).toString());
+            }
+        }
+//        Row row = firstSheet.createRow(1);
+//        row.createCell(0).setCellValue(rows.get(0).get(columns.get(0).getName()).toString());
+//        row.createCell(1).setCellValue(rows.get(1).get(columns.get(1).getName()).toString());
     }
 
     private ByteArrayInputStream exportAsByteArrayInputStream(Workbook workbook) throws IOException {

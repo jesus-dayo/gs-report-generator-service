@@ -36,6 +36,7 @@ public class ReportExcelExporterTest {
 
         Body body = reportData.getBody();
         List<Column> columns = body.getColumns();
+        List<Map<String, Object>> rows = body.getRows();
 
         final int HEADER_ROW = 0;
         Row headerRow = firstSheet.getRow(HEADER_ROW);
@@ -46,21 +47,30 @@ public class ReportExcelExporterTest {
         Row firstDataRow = firstSheet.getRow(1);
         assertNotNull(firstDataRow);
 
-        Cell firstDataRowCell = firstDataRow.getCell(0);
-
-        List<Map<String, Object>> rows = body.getRows();
-        assertEquals(rows.get(0).get(columns.get(0).getName()), firstDataRowCell.getStringCellValue());
-
-        Cell secondDataRowCell = firstDataRow.getCell(1);
-        assertEquals(rows.get(1).get(columns.get(1).getName()), secondDataRowCell.getStringCellValue());
+        verifyDataForEachRows(columns, rows, firstSheet);
     }
 
-    private void verifyHeaderColumns(List<Column> headers, Row headerRow) {
-        verifyColumn(headers.get(0), headerRow.getCell(0));
-        verifyColumn(headers.get(1), headerRow.getCell(1));
-        verifyColumn(headers.get(2), headerRow.getCell(2));
-        verifyColumn(headers.get(3), headerRow.getCell(3));
-        verifyColumn(headers.get(4), headerRow.getCell(4));
+    private void verifyDataForEachRows(List<Column> columns, List<Map<String, Object>> rows, Sheet sheet) {
+        for (int i = 0; i < rows.size(); i++) {
+            Row dataRow = sheet.getRow(i + 1);
+            for (int j = 0; j < columns.size(); j++) {
+                verifyRow(columns.get(j), rows.get(j), dataRow.getCell(j));
+            }
+        }
+    }
+
+    private void verifyRow(Column column, Map<String, Object> row, Cell cell) {
+        if (column.getType().equalsIgnoreCase("double") || column.getType().equalsIgnoreCase("decimal")) {
+            assertEquals(Double.parseDouble(row.get(column.getName()).toString()), Double.parseDouble(cell.getStringCellValue()), "encounter error with column key " + column.getName());
+        } else {
+            assertEquals(row.get(column.getName()), cell.getStringCellValue(), "encounter error with column key " + column.getName());
+        }
+    }
+
+    private void verifyHeaderColumns(List<Column> columns, Row headerRow) {
+        for (int i = 0; i < columns.size(); i++) {
+            verifyColumn(columns.get(i), headerRow.getCell(i));
+        }
     }
 
     private void verifySheetData(Sheet sheet) {
