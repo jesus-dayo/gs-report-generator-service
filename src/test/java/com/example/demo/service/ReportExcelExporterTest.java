@@ -27,7 +27,8 @@ public class ReportExcelExporterTest {
     @Test
     public void exportUserData_whenValidData_returnsExcelFile() throws IOException {
         ReportData reportData = createReportData();
-        ReportExcelExporter reportExcelExporter = new ReportExcelExporter();
+        StylesGenerator stylesGenerator = new StylesGenerator();
+        ReportExcelExporter reportExcelExporter = new ReportExcelExporter(stylesGenerator);
         ByteArrayInputStream data = reportExcelExporter.export(reportData);
         assertNotNull(data);
 

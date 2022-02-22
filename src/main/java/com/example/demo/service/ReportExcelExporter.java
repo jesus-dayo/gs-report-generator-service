@@ -1,10 +1,11 @@
 package com.example.demo.service;
 
+import com.example.demo.enums.CustomCellStyle;
 import com.example.demo.model.Body;
 import com.example.demo.model.Column;
 import com.example.demo.model.ReportData;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -20,23 +21,36 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ReportExcelExporter {
+
+    private final StylesGenerator stylesGenerator;
 
     public ByteArrayInputStream export(ReportData reportData) {
         log.debug("start exporting excel data");
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet firstSheet = workbook.createSheet("new sheet");
-            createHeaderRow(firstSheet, reportData);
+            Map<CustomCellStyle, CellStyle> styles = stylesGenerator.prepareStyles(workbook);
 
+            Sheet firstSheet = workbook.createSheet("new sheet");
             Body body = reportData.getBody();
             List<Column> columns = body.getColumns();
             List<Map<String, Object>> rows = body.getRows();
+
+            setColumnsWidth(firstSheet, columns);
+            createHeaderRow(firstSheet, columns, styles);
+
 
             createDataRows(workbook, firstSheet, columns, rows);
             return exportAsByteArrayInputStream(workbook);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private void setColumnsWidth(Sheet sheet, List<Column> columns) {
+        for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++) {
+            sheet.setColumnWidth(columnIndex, 256 * 20);
         }
     }
 
@@ -81,15 +95,15 @@ public class ReportExcelExporter {
         return sheet.createRow(index);
     }
 
-    private void createHeaderRow(Sheet sheet, ReportData reportData) {
+    private void createHeaderRow(Sheet sheet, List<Column> columns, Map<CustomCellStyle, CellStyle> styles) {
         final int HEADER_ROW = 0;
         Row headerRow = sheet.createRow(HEADER_ROW);
 
-        List<Column> columns = reportData.getBody().getColumns();
         for (int i = 0; i < columns.size(); i++) {
             Column column = columns.get(i);
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(column.getName());
+            cell.setCellStyle(styles.get(CustomCellStyle.GREY_CENTERED_BOLD_ARIAL_WITH_BORDER));
         }
     }
 
