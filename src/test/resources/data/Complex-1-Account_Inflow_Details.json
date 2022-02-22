@@ -1,0 +1,36 @@
+{
+  "body": {
+    "Account Inflow Details": {
+      "columns": [
+        {
+          "name": "checkInflow",
+          "type": "decimal",
+          "field": "checkInflow"
+        },
+        {
+          "name": "groupAccount",
+          "type": "string",
+          "field": "groupAccount"
+        },
+        {
+          "name": "reportDate_Day",
+          "type": "decimal",
+          "field": "reportDate_Day"
+        },
+        {
+          "name": "totalTransDaysInflow",
+          "type": "decimal",
+          "field": "totalTransDaysInflow"
+        }
+      ],
+      "rows": [
+        {
+          "groupAccount": "132132",
+          "totalTransDaysInflow": 0,
+          "reportDate_Day": 30,
+          "checkInflow": 32560944
+        }
+      ]
+    }
+  }
+}
