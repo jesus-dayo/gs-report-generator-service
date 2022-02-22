@@ -4,10 +4,8 @@ import com.example.demo.model.Body;
 import com.example.demo.model.Column;
 import com.example.demo.model.ReportData;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -34,7 +32,7 @@ public class ReportExcelExporter {
             List<Column> columns = body.getColumns();
             List<Map<String, Object>> rows = body.getRows();
 
-            createDataRows(firstSheet, columns, rows);
+            createDataRows(workbook, firstSheet, columns, rows);
             return exportAsByteArrayInputStream(workbook);
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,25 +40,38 @@ public class ReportExcelExporter {
         }
     }
 
-    private void createDataRows(Sheet firstSheet, List<Column> columns, List<Map<String, Object>> rows) {
+    private void createDataRows(Workbook workbook, Sheet firstSheet, List<Column> columns, List<Map<String, Object>> rows) {
         for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
             Row row = createNewDataRow(firstSheet, rowIndex + 1);
-            createRowCellData(columns, rows.get(rowIndex), row);
+            createRowCellData(workbook, columns, rows.get(rowIndex), row);
         }
     }
 
-    private void createRowCellData(List<Column> columns, Map<String, Object> rowRawData, Row row) {
-        System.out.println("rowRawData = " + rowRawData);
+    private void createRowCellData(Workbook workbook, List<Column> columns, Map<String, Object> rowRawData, Row row) {
         for (int i = 0; i < columns.size(); i++) {
             Cell cell = row.createCell(i);
             Column column = columns.get(i);
-            String dataKey = column.getName();
+            Object dataValue = rowRawData.get(column.getName());
             String type = column.getType();
             if (type.equalsIgnoreCase("double") || type.equalsIgnoreCase("decimal")) {
-                BigDecimal value = rowRawData.get(dataKey) == null ? BigDecimal.ZERO : new BigDecimal(rowRawData.get(dataKey).toString());
+                if (dataValue == null) {
+                    continue;
+                }
+
+                BigDecimal value = new BigDecimal(dataValue.toString());
+                if (value.doubleValue() == 0) {
+                    cell.setCellValue("");
+                    continue;
+                }
+
+                CellStyle cellStyle = workbook.createCellStyle();
+                cellStyle.setDataFormat((short) 0x27);
+
                 cell.setCellValue(value.doubleValue());
+                cell.setCellStyle(cellStyle);
+
             } else {
-                String value = rowRawData.get(dataKey) == null ? "" : rowRawData.get(dataKey).toString();
+                String value = dataValue == null ? "" : dataValue.toString();
                 cell.setCellValue(value);
             }
         }
