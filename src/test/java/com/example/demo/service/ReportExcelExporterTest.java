@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public class ReportExcelExporterTest {
         if (column.getType().equalsIgnoreCase("double") || column.getType().equalsIgnoreCase("decimal")) {
             assertEquals(
                     Double.parseDouble(row.get(column.getName()).toString()),
-                    Double.parseDouble(cell.getStringCellValue()),
+                    cell.getNumericCellValue(),
                     "encounter error with column key " + column.getName()
             );
         } else {

@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -52,9 +53,16 @@ public class ReportExcelExporter {
         System.out.println("rowRawData = " + rowRawData);
         for (int i = 0; i < columns.size(); i++) {
             Cell cell = row.createCell(i);
-            String rowKey = columns.get(i).getName();
-            String value = rowRawData.get(rowKey) == null ? "" : rowRawData.get(rowKey).toString();
-            cell.setCellValue(value);
+            Column column = columns.get(i);
+            String dataKey = column.getName();
+            String type = column.getType();
+            if (type.equalsIgnoreCase("double") || type.equalsIgnoreCase("decimal")) {
+                BigDecimal value = rowRawData.get(dataKey) == null ? BigDecimal.ZERO : new BigDecimal(rowRawData.get(dataKey).toString());
+                cell.setCellValue(value.doubleValue());
+            } else {
+                String value = rowRawData.get(dataKey) == null ? "" : rowRawData.get(dataKey).toString();
+                cell.setCellValue(value);
+            }
         }
     }
 
